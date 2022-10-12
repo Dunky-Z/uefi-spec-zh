@@ -1,6 +1,6 @@
 ---
 title: "Unified Extensible Firmware Interface (UEFI) 规范"
-subtitle: "UEFI规范中文"
+subtitle: "UEFI规范-中文"
 version: "V2.9"
 date: "2022-10"
 company: UEFI
