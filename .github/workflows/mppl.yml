@@ -30,7 +30,8 @@ jobs:
           sudo apt-get clean
       - name: build pdf
         run: |
-          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=./templates/mppl.tex  --output=./output/UEFI-Spec-zh.pdf ./src/*.md
+          cd src
+          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../templates/mppl.tex  --output=../output/UEFI-Spec-zh.pdf *.md
       - uses: actions/upload-artifact@master
         with:
           name: output
