@@ -31,7 +31,7 @@ jobs:
       - name: build pdf
         run: |
           cd src
-          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../templates/mppl.tex  --output=../output/UEFI-Spec-zh.pdf *.md
+          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../templates/mppl.tex  --output=../output/UEFI规范-中文.pdf *.md
       - uses: actions/upload-artifact@master
         with:
           name: output
