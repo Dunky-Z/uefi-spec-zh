@@ -1,0 +1,37 @@
+name: MPPL
+
+on: push
+
+jobs:
+  convert_via_pandoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: create file list
+        id: files_list
+        run: |
+          mkdir output  # create output dir
+      - name: add fonts
+        run: |
+          sudo apt-get install ttf-mscorefonts-installer
+          sudo apt-get install fontconfig
+          fc-list :lang=zh
+          ls -lh /usr/share/fonts/
+          cp -rf ./fonts/* /usr/share/fonts/
+          mkfontscale
+          mkfontdir
+          fc-cache
+          fc-list
+      - name: install pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install texlive-full
+          sudo apt-get install pandoc
+          sudo apt-get clean
+      - name: build pdf
+        run: |
+          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=./templates/mppl.tex  --output=./output/UEFI-Spec-zh.pdf ./src/*.md
+      - uses: actions/upload-artifact@master
+        with:
+          name: output
+          path: output
