@@ -4,6 +4,10 @@
 
 因UEFI规范主要是定义Protocol，是用来查阅的一个手册，想要学习入门UEFI只需要学习前八章即可，所以计划**只翻译前八章内容**。
 
+## URL Link
+
+[Unified Extensible Firmware Interface_V2.9](https://uefi.org/sites/default/files/resources/UEFI_Spec_2_9_2021_03_18.pdf)
+
 ## Build PDF
 
 ```bash
