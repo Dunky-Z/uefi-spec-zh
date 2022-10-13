@@ -4,7 +4,7 @@ cd ./src
 dir 
 
 @REM Use autocorrect to fix typo 
-autocorrect.exe --fix ./*.md
+autocorrect.exe --fix 1-Introduction.md 2-Overview.md 
 
 @REM Use markdownlint to check markdown style
 markdownlint -c ../.markdownlint.json -f 1-Introduction.md 2-Overview.md 
