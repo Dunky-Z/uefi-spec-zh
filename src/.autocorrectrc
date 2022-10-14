@@ -1,6 +1,23 @@
+rules:
+  # Auto add spacing between CJK (Chinese, Japanese, Korean) and English words.
+  # 0 - off, 1 - error, 2 - warning
+  space-word: 1
+  # Add space between some punctuations.
+  space-punctuation: 1
+  # Convert to fullwidth.
+  fullwidth: 1
+  # Convert to halfwidth.
+  halfwidth: 1
+  # To remove space near the fullwidth.
+  no-space-fullwidth: 1
+  # Spellcheck
+  spellcheck: 2
+  
 spellcheck:
   mode: 1
   words:
+    - 列举 = 枚举
+    - 媒体 = 媒介
     - ActiveMQ
     - AirPods
     - Aliyun
