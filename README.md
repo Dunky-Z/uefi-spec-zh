@@ -47,7 +47,7 @@ markdownlint -c ../.markdownlint.json -f 1-Introduction.md 2-Overview.md
 ```bash
 mkdir build
 cd src
-pandoc -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templates/mppl.tex -s --listings ./*.md -o ../build/UEFI-Spec-zh.pdf
+pandoc -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templates/mppl.tex -s --listings ./*.md -o ../build/UEFI规范-中文.pdf
 ```
 
 ### Windows
@@ -55,5 +55,5 @@ pandoc -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templa
 ```bash
 md build
 cd src
-pandoc.exe -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templates/mppl.tex -s --listings 1-Introduction.md 2-Overview.md  -o ../build/UEFI-Spec-zh.pdf
+pandoc.exe -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templates/mppl.tex -s --listings 0-Preface.md 1-Introduction.md 2-Overview.md  -o ../build/UEFI规范-中文.pdf
 ```
