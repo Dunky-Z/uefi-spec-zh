@@ -12,7 +12,7 @@ UEFI 允许通过加载 UEFI 驱动程序和 UEFI 应用程序映像来扩展平
 
 UEFI 允许将来自 OS 加载程序和平台固件的引导菜单合并到单个平台固件菜单中。这些平台固件菜单，将允许从 UEFI 引导服务支持的任何引导介质上的任何分区中选择任何 UEFI OS 加载程序。UEFI OS 加载程序可以支持可以出现在用户界面上的多个选项。还可以包括传统引导选项，例如从平台固件引导菜单中的 A: 或 C: 驱动器引导。
 
-UEFI 支持从包含 UEFI 操作系统加载程序或 UEFI 定义的系统分区的媒介引导。UEFI 需要 UEFI 定义的系统分区才能从块设备引导。UEFI 不需要对分区的第一个扇区进行任何更改，因此可以构建媒介在旧架构和 UEFI 平台上启动。
+UEFI 支持从包含 UEFI 操作系统加载程序或 UEFI 定义的系统分区的媒介引导。 UEFI 需要 UEFI 定义的系统分区才能从块设备引导。 UEFI 不需要对分区的第一个扇区进行任何更改，因此可以构建媒介在旧架构和 UEFI 平台上启动。
 
 ## 要求
 
@@ -37,15 +37,15 @@ UEFI 支持从包含 UEFI 操作系统加载程序或 UEFI 定义的系统分区
 7. 如果一个平台支持 UEFI 通用网络应用，那么 `EFI_MANAGED_NETWORK_PROTOCOL`, `EFI_MANAGED_NETWORK_SERVICE_BINDING_PROTOCOL`, `EFI_ARP_PROTOCOL`, `EFI_ARP_SERVICE_BINDING_PROTOCOL`, `EFI_DHCP4_PROTOCOL`, `EFI_DHCP4_SERVICE_BINDING_PROTOCOL`。 `EFI_TCP4_PROTOCOL`, `EFI_TCP4_SERVICE_BINDING_PROTOCOL`, `EFI_IP4_PROTOCOL`, `EFI_IP4_SERVICE_BINDING_PROTOCOL`, `EFI_IP4_CONFIG2_PROTOCOL`, `EFI_UDP4_PROTOCOL` 和 `EFI_UDP4_SERVICE_BINDING_PROTOCOL` 是必需的。如果该平台需要额外的 IPv6 支持，那么需要 `EFI_DHCP6_PROTOCOL、EFI_DHCP6_SERVICE_BINDING_PROTOCOL`、`EFI_TCP6_PROTOCOL`、`EFI_TCP6_SERVICE_BINDING_PROTOCOL`。`EFI_IP6_PROTOCOL`、`EFI_IP6_SERVICE_BINDING_PROTOCOL`、`EFI_IP6_CONFIG_PROTOCOL`、`EFI_UDP6_PROTOCOL` 和 `EFI_UDP6_SERVICE_BINDING_PROTOCOL` 是额外要求的。如果网络应用需要 DNS 功能，`EFI_DNS4_SERVICE_BINDING_PROTOCOL` 和 `EFI_DNS4_PROTOCOL` 是 IPv4 协议栈的必备条件。IPv6 协议栈需要 `EFI_DNS6_SERVICE_BINDING_PROTOCOL` 和 `EFI_DNS6_PROTOCOL`。如果网络环境需要 `TLS` 功能，需要 `EFI_TLS_SERVICE_BINDING_PROTOCOL`、`EFI_TLS_PROTOCOL` 和 `EFI_TLS_CONFIGURATION_PROTOCOL`。如果网络环境需要 `IPSEC` 功能，需要 `EFI_IPSEC_CONFIG_PROTOCOL` 和 `EFI_IPSEC2_PROTOCOL`。如果网络环境需要 VLAN 功能，需要 `EFI_VLAN_CONFIG_PROTOCOL`。
 8. 如果一个平台包括一个字节流设备，如 UART，那么 `EFI_SERIAL_IO_PROTOCOL` 必须被实现。
 9. 如果一个平台包括 PCI 总线支持，那么 `EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL`，`EFI_PCI_IO_PROTOCOL`，必须被实现。
-10. 如果一个平台包括 USB 总线支持，那么必须实现 EFI_USB2_HC_PROTOCOL 和 EFI_USB_IO_PROTOCOL。一个外部设备可以通过产生一个 USB 主机控制器协议来支持 USB。
-11. 如果一个平台包括一个 NVM Express 控制器，那么必须实现 EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL。
-12. 如果一个平台支持从面向块的 NVM Express 控制器启动，那么必须实现 EFI_BLOCK_IO_PROTOCOL。一个外部驱动程序可以产生 EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL。从 NVM Express 子系统启动所需的所有其他协议必须由平台携带。
-13. 如果一个平台包括一个利用SCSI命令包的I/O子系统，那么EFI_EXT_SCSI_PASS_THRU_PROTOCOL必须被实现。
-14. 如果一个平台支持从面向块的 SCSI 外设启动，那么必须实现 EFI_SCSI_IO_PROTOCOL 和 EFI_BLOCK_IO_PROTOCOL。一个外部驱动程序可以产生 EFI_EXT_SCSI_PASS_THRU_PROTOCOL。从 SCSI I/O子系统启动所需的所有其他协议必须由平台携带。
-15. 如果一个平台支持从 iSCSI 外围启动，那么必须实现 EFI_ISCSI_INITIATOR_NAME_PROTOCOL 和 EFI_AUTHENTICATION_INFO_PROTOCOL。
-16. 如果一个平台包括调试功能，那么 EFI_DEBUG_SUPPORT_PROTOCOL、EFI_DEBUGPORT_PROTOCOL 和 EFI 图像信息表必须被实现。
-17. 如果一个平台包括将默认驱动程序覆盖到 UEFI 驱动程序模型提供的控制器匹配算法的能力，那么必须实现 EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL。
-18. 如果一个平台包括一个利用ATA命令包的I/O子系统，那么必须实现EFI_ATA_PASS_THRU_PROTOCOL。
+10. 如果一个平台包括 USB 总线支持，那么必须实现 `EFI_USB2_HC_PROTOCOL` 和 `EFI_USB_IO_PROTOCOL`。一个外部设备可以通过产生一个 USB 主机控制器协议来支持 USB。
+11. 如果一个平台包括一个 NVM Express 控制器，那么必须实现 `EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL`。
+12. 如果一个平台支持从面向块的 NVM Express 控制器启动，那么必须实现 `EFI_BLOCK_IO_PROTOCOL`。一个外部驱动程序可以产生 `EFI_NVM_EXPRESS_PASS_THRU_PROTOCOL`。从 NVM Express 子系统启动所需的所有其他协议必须由平台携带。
+13. 如果一个平台包括一个利用SCSI命令包的I/O子系统，那么`EFI_EXT_SCSI_PASS_THRU_PROTOCOL`必须被实现。
+14. 如果一个平台支持从面向块的 SCSI 外设启动，那么必须实现 `EFI_SCSI_IO_PROTOCOL` 和 `EFI_BLOCK_IO_PROTOCOL`。一个外部驱动程序可以产生 `EFI_EXT_SCSI_PASS_THRU_PROTOCO`L。从 SCSI I/O子系统启动所需的所有其他协议必须由平台携带。
+15. 如果一个平台支持从 iSCSI 外围启动，那么必须实现 `EFI_ISCSI_INITIATOR_NAME_PROTOCOL` 和 `EFI_AUTHENTICATION_INFO_PROTOCOL`。
+16. 如果一个平台包括调试功能，那么 `EFI_DEBUG_SUPPORT_PROTOCOL`、`EFI_DEBUGPORT_PROTOCOL` 和 EFI 图像信息表必须被实现。
+17. 如果一个平台包括将默认驱动程序覆盖到 UEFI 驱动程序模型提供的控制器匹配算法的能力，那么必须实现 `EFI_PLATFORM_DRIVER_OVERRIDE_PROTOCOL`。
+18. 如果一个平台包括一个利用ATA命令包的I/O子系统，那么必须实现`EFI_ATA_PASS_THRU_PROTOCOL`。
 19. 如果一个平台支持来自非永久连接到平台的设备的选项 ROM，并且支持验证这些选项 ROM 的能力，那么它必须支持《网络协议-UDP 和 MTFTP》中描述的选项 ROM 验证方法和第 8.1.1 节中描述的验证 EFI 变量。
 20. 如果一个平台包括验证 UEFI 图像的能力，并且该平台可能支持一个以上的操作系统加载器，它必须支持网络协议--UDP 和 MTFTP 中描述的方法以及第 8.1.1 节中描述的验证 UEFI 变量。
-21. 从 UEFI 规范 2.8 版开始，不再需要 EBC 支持。如果一个 EBC 解释器被实现，那么它必须产生 EFI_EBC_PROTOCOL 接口。
+21. 从 UEFI 规范 2.8 版开始，不再需要 EBC 支持。如果一个 EBC 解释器被实现，那么它必须产生 `EFI_EBC_PROTOCOL` 接口。

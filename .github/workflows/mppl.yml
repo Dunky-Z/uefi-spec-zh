@@ -20,9 +20,6 @@ jobs:
           sudo apt-get install fontconfig
           fc-list :lang=zh
           ls -lh /usr/share/fonts/
-          cd MPPL
-          ls -a
-          cd ..
           cp -rf ./MPPL/fonts/* /usr/share/fonts/
           mkfontscale
           mkfontdir
