@@ -8,6 +8,7 @@ logo: true
 logo-url: ../pic/logo.png
 lot: false
 lof: true
+mainfont: Lato
 header-right: UEFI
 department: UEFI
 history:

@@ -11,13 +11,19 @@ jobs:
         id: files_list
         run: |
           mkdir output  # create output dir
+      - name: Git Sumbodule Update
+        run: |
+          git submodule update --init --remote --recursive
       - name: add fonts
         run: |
           sudo apt-get install ttf-mscorefonts-installer
           sudo apt-get install fontconfig
           fc-list :lang=zh
           ls -lh /usr/share/fonts/
-          cp -rf ./fonts/* /usr/share/fonts/
+          cd MPPL
+          ls -a
+          cd ..
+          cp -rf ./MPPL/fonts/* /usr/share/fonts/
           mkfontscale
           mkfontdir
           fc-cache
@@ -31,7 +37,7 @@ jobs:
       - name: build pdf
         run: |
           cd src
-          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../templates/mppl.tex  --output=../output/UEFI规范-中文.pdf *.md
+          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../MPPL/templates/mppl.tex  --output=../output/UEFI规范-中文.pdf *.md
       - uses: actions/upload-artifact@master
         with:
           name: output
