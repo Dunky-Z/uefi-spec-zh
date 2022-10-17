@@ -16,6 +16,71 @@ UEFI 支持从包含 UEFI 操作系统加载程序或 UEFI 定义的系统分区
 
 ## 引导管理器
 
+UEFI 包含一个引导管理器，允许从 UEFI 定义的文件系统上的任何文件加载符合该规范的程序，或通过使用 UEFI 定义的镜像加载服务来加载符合该规范编写的应用程序（包括操作系统第一阶段加载器）或 UEFI 驱动程序。UEFI 定义了 NVRAM 变量，用来指向要加载的文件。这些变量还包含直接传递给 UEFI 应用程序的应用程序特定数据。这些变量还包含一个可读的字符串，可以在菜单中显示给用户。
+
+UEFI 定义的变量允许系统固件包含一个启动菜单，可以指向所有的操作系统，甚至是同一操作系统的多个版本。UEFI 的设计目标是拥有一套可以在平台固件中生存的启动菜单。UEFI 只规定了用于选择启动选项的 NVRAM 变量。UEFI 将菜单系统的实现作为增值的实现空间。
+
+UEFI 大大扩展了系统的启动灵活性，超过了目前 PC-AT 级系统的技术状态。今天的 PC-AT 级系统被限制在从第一个软盘、硬盘、CD-ROM、USB 键或连接到系统的网卡启动。从一个普通的硬盘驱动器启动会导致操作系统之间的许多互操作性问题，以及同一供应商的不同版本的操作系统。
+
+
+### UEFI 镜像
+
+UEFI 镜像是由 UEFI 定义的一类文件，包含可执行代码。UEFI 镜像最突出的特点是，UEFI 镜像文件的第一组字节包含一个镜像头，定义了可执行镜像的编码。
+
+UEFI 使用 PE32+镜像格式的一个子集，并修改了头签名。对 PE32+镜像中签名值的修改是为了将 UEFI 镜像与正常的 PE32 可执行文件区分开来。PE32 的 "+"添加提供了标准 PE32 格式的 64 位重定位修复扩展。
+
+对于具有 UEFI 镜像签名的镜像，PE 镜像头中的*`Subsystem`*值定义如下。镜像类型之间的主要区别是固件将镜像加载到的内存类型，以及镜像的入口点退出或返回时采取的行动。当控制权从镜像入口点返回时，UEFI 应用程序镜像总是被卸载。一个 UEFI 驱动镜像只有在控制权被传回，并有 UEFI 错误代码时才被卸载。
+
+```C
+// PE32+ Subsystem type for EFI images
+#define EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION         10
+#define EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER 11
+#define EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER      12
+// PE32+ Machine type for EFI images
+#define EFI_IMAGE_MACHINE_IA32                      0x014c
+#define EFI_IMAGE_MACHINE_IA64                      0x0200
+#define EFI_IMAGE_MACHINE_EBC                       0x0EBC
+#define EFI_IMAGE_MACHINE_x64                       0x8664
+#define EFI_IMAGE_MACHINE_ARMTHUMB_MIXED            0x01C2 
+#define EFI_IMAGE_MACHINE_AARCH64                   0xAA64
+#define EFI_IMAGE_MACHINE_RISCV32                   0x5032
+#define EFI_IMAGE_MACHINE_RISCV64                   0x5064
+#define EFI_IMAGE_MACHINE_RISCV128                  0x5128
+```
+
+**注意**：选择这种映像类型是为了使 UEFI 映像包含 Thumb 和 Thumb2 指令，同时将 EFI 接口本身定义为 ARM 模式。
+
+![](../pic/table2-1.jpg "")
+
+在 PE 镜像文件头中的`Machine`值是用来指示镜像的机器码类型。带有 UEFI 镜像签名的镜像的机器码类型定义如下。一个给定的平台必须实现该平台的本地镜像类型和 EFI 字节码（EBC）的镜像类型。对其他机器码类型的支持对平台来说是可选的。
+
+UEFI 镜像是通过`EFI_BOOT_SERVICES.LoadImage()`启动服务加载到内存中。这个服务将一个 PE32+格式的镜像加载到内存中。这个 PE32+加载器需要将 PE32+镜像的所有部分加载到内存中。一旦镜像被加载到内存中，并进行了适当的修复，根据基于支持的 32 位、64 位或 128 位处理器的应用程序的正常间接调用惯例，控制被转移到*`AddressOfEntryPoint`*引用处的加载镜像。所有其他与 UEFI 镜像的链接都是通过编程完成的。
+
+### UEFI 应用程序
+
+根据该规范编写的应用程序，由启动管理器或其他 UEFI 应用程序加载。为了加载 UEFI 应用程序，固件会分配足够的内存来容纳镜像，将 UEFI 应用程序镜像中的部分复制到分配的内存中，并应用所需的重定位修复。一旦完成，分配的内存将被设置为适当的代码和数据类型，用于镜像。然后控制权被转移到 UEFI 应用程序的入口点。当应用程序从其入口点返回时，或者当它调用启动服务`EFI_BOOT_SERVICES.Exit()`时，UEFI 应用程序被从内存中卸载，控制权被返回到加载 UEFI 应用程序的 UEFI 组件。
+
+当 Boot Manager 加载一个 UEFI 应用程序时，镜像句柄可被用来定位 UEFI 应用程序的 "加载选项"。加载选项存储在非易失性存储器中，与正在加载的 UEFI 应用程序相关，并由 Boot Manager 执行。
+
+
+### UEFI 操作系统加载器
+
+UEFI 操作系统加载器（UEFI OS Loader）是一种特殊类型的 UEFI 应用程序，通常从符合本规范的固件中接管对系统的控制。当加载时，UEFI 操作系统加载器的行为与其他 UEFI 应用程序一样，它只能使用它从固件中分配的内存，并且只能使用 UEFI 服务和协议来访问固件所暴露的设备。如果 UEFI 操作系统加载器包括任何启动服务风格的驱动功能，它必须使用适当的 UEFI 接口来获得对总线特定资源的访问。也就是说，I/O 和内存映射的设备寄存器，必须通过总线特定的 I/O 调用来访问，就像 UEFI 驱动程序所执行的那样。
+
+如果 UEFI 操作系统加载器遇到问题，不能正确加载其操作系统，它可以释放所有分配的资源，并通过启动服务 `Exit()` 调用将控制权返回给固件。`Exit()` 调用允许返回一个错误代码和 *`ExitData`*。*`ExitData`* 包含一个字符串和操作系统加载器特定的数据。
+
+如果 UEFI 操作系统加载器成功加载其操作系统，它可以通过使用启动服务 `EFI_BOOT_SERVICES.ExitBootServices()` 来控制系统。在成功调用 `ExitBootServices()` 后，系统中所有的启动服务被终止，包括内存管理，UEFI 操作系统加载器负责系统的继续运行。
+
+### UEFI 驱动
+
+UEFI 驱动程序是由启动管理器、符合本规范的固件或其他 UEFI 应用程序加载的。为了加载 UEFI 驱动程序，固件会分配足够的内存来容纳镜像，将 UEFI 驱动程序镜像中的部分复制到分配的内存中，并应用需要的重定位修复。一旦完成，分配的内存就会被设置为适当的代码和数据类型，以用于镜像。然后控制权被转移到 UEFI 驱动的入口点。当 UEFI 驱动从其入口点返回时，或者当它调用启动服务 `EFI_BOOT_SERVICES.Exit()` 时，UEFI 驱动被选择性地从内存中卸载，控制被返回到加载 UEFI 驱动的组件。如果 UEFI 驱动程序返回的状态码是 `EFI_SUCCESS`，它就不会从内存中卸载。如果 UEFI 驱动的返回代码是一个错误的状态代码，那么该驱动将从内存中卸载。
+
+有两种类型的 UEFI 驱动：启动服务驱动和运行时驱动。这两种驱动类型的唯一区别是，UEFI 运行时驱动是在 UEFI 操作系统加载器通过启动服务 `EFI_BOOT_SERVICES.ExitBootServices()` 控制了平台之后才可用。
+
+当 `ExitBootServices()` 被调用时，UEFI 引导服务驱动被终止，UEFI 引导服务驱动所消耗的所有内存资源被释放，以便在操作系统环境中使用。
+
+当操作系统调用 `SetVirtualAddressMap()` 时，`EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER` 类型的运行时驱动程序被固定为虚拟映射。
+
 ## 固件核心
 
 ## 调用约定
@@ -126,3 +191,4 @@ UEFI 支持从包含 UEFI 操作系统加载程序或 UEFI 定义的系统分区
 *TCG EFI 协议规范*：由 Trusted Computing Group 发布和主持（参见 "UEFI 相关文件的链接"（<http://uefi.org/uefi>）。. 本文件定义了 EFI 平台上 TPM 的标准接口。
 
 其他的扩展文件可能存在于 UEFI 论坛的视野之外，也可能是在本文件最后一次修订之后创建的。
+
