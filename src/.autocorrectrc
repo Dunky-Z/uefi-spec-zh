@@ -16,6 +16,7 @@ rules:
 spellcheck:
   mode: 1
   words:
+    - 引导 = 启动
     - 列举 = 枚举
     - 媒体 = 媒介
     - 图像 = 镜像

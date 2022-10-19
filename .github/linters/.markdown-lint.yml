@@ -21,8 +21,7 @@
 MD004: false                  # Unordered list style
 MD007: false
 MD010: false
-MD013:
-  line_length: 400            # Line length 80 is far to short
+MD013: false
 MD024: false
 MD025: false
 MD026:
@@ -31,6 +30,7 @@ MD029: false                  # Ordered list item prefix
 MD033: false                  # Allow inline HTML
 MD036: false                  # Emphasis used instead of a heading
 MD045: false
+MD047: false
 #################
 # Rules by tags #
 #################
