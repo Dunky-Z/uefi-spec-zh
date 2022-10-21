@@ -78,6 +78,7 @@ UINT32                              Attributes; UINT16                          
  // UINT8                            OptionalData[];
 } EFI_LOAD_OPTION;
 ```
+
 参数
 
 - **Attributes**：此加载选项条目的属性。所有未使用的位必须为零，并由 UEFI 规范为未来的发展保留。参见 "相关定义"。
@@ -209,3 +210,148 @@ struct {
 `LOAD_OPTION_FORCE_RECONNECT` 属性选项对于 `SysPrep####`变量来说是被忽略的，如果这样启动的应用程序执行了一些增加可用硬件或驱动程序的操作，系统准备应用程序本身应利用对 `ConnectController()` 或 `DisconnectController()`的适当调用来修改驱动程序和硬件之间的连接。
 
 在所有 `SysPrep####` 变量启动和退出后，平台应通知 `EFI_EVENT_GROUP_READY_TO_BOOT` 和 `EFI_EVENT_GROUP_AFTER_READY_TO_BOOT` 事件组，并开始按照 `BootOrder` 定义的顺序评估属性设置为 `LOAD_OPTION_CATEGORY_BOOT` 的 `Boot####`变量。在 `EFI_EVENT_GROUP_AFTER_READY_TO_BOOT` 事件组处理完成之前，不应评估标记为 `LOAD_OPTION_CATEGORY_BOOT` 的变量的 `FilePathList`。
+
+## 启动管理器策略协议
+
+### EFI_BOOT_MANAGER_POLICY_PROTOCOL
+
+#### 摘要
+
+这个协议被 EFI 应用程序用来请求 UEFI 启动管理器使用平台策略连接设备。
+
+#### GUID
+
+```C
+#define EFI_BOOT_MANAGER_POLICY_PROTOCOL_GUID \ 
+{ 0xFEDF8E0C, 0xE147, 0x11E3,\ 
+{ 0x99, 0x03, 0xB8, 0xE8, 0x56, 0x2C, 0xBA, 0xFA } }
+```
+
+#### 协议接口结构
+
+```C
+typedef struct _EFI_BOOT_MANAGER_POLICY_PROTOCOL EFI_BOOT_MANAGER_POLICY_PROTOCOL;struct _EFI_BOOT_MANAGER_POLICY_PROTOCOL { UINT64                                       Revision; 
+EFI_BOOT_MANAGER_POLICY_CONNECT_DEVICE_PATH   ConnectDevicePath; EFI_BOOT_MANAGER_POLICY_CONNECT_DEVICE_CLASS ConnectDeviceClass;
+};
+
+ConnectDevicePath Connect a Device Path following the platforms EFI Boot Manager policy. 
+ConnectDeviceClassConnect a class of devices, named by EFI_GUID, following the platforms UEFI Boot Manager policy.
+```
+
+#### 描述
+
+EFI_BOOT_MANAGER_POLICY_PROTOCOL 是由平台固件产生的，以暴露启动管理器策略和平台特定的 EFI_BOOT_SERVICES.ConnectController() 行为。
+
+#### 相关定义
+
+```C
+#define EFI_BOOT_MANAGER_POLICY_PROTOCOL_REVISION 0x00010000
+```
+
+### EFI_BOOT_MANAGER_POLICY_PROTOCOL.ConnectDevicePath()
+
+#### 摘要
+
+按照平台的 EFI 启动管理器策略，连接一个设备路径。
+
+#### 原型
+
+```C
+typedef EFI_STATUS(EFIAPI *EFI_BOOT_MANAGER_POLICY_CONNECT_DEVICE_PATH)(
+     IN EFI_BOOT_MANAGER_POLICY_PROTOCOL   *This, 
+     IN EFI_DEVICE_PATH                    *DevicePath, 
+     IN BOOLEAN                            Recursive
+);
+```
+
+#### 参数
+
+- This：指向 EFI_BOOT_MANAGER_POLICY_PROTOCOL 实例的指针。类型为上面定义的 EFI_BOOT_MANAGER_POLICY_PROTOCOL。
+- DevicePath：指向要连接的 EFI 设备路径的起点。如果 DevicePath 为 NULL，那么系统中的所有控制器都将使用平台的 EFI 启动管理器策略进行连接。
+- Recursive：如果是 TRUE，那么 ConnectController() 将被递归调用，直到 DevicePath 指定的控制器下面的整个控制器树都被创建。如果是 FALSE，那么控制器树只扩展一级。如果 DevicePath 是 NULL，那么递归将被忽略。
+
+#### 描述
+
+ConnectDevicePath() 函数允许调用者使用与 EFI Boot Manager 相同的策略连接 DevicePath。如果递归为 true，那么 ConnectController() 将被递归调用，直到 DevicePath 指定的控制器下面的整个控制器树都被创建。如果递归为 FALSE，那么控制器树只扩展一级。如果 DevicePath 是 NULL，那么递归将被忽略。
+
+#### 返回的状态代码
+
+| 状态码 | 描述 |
+| :----: | :----: |
+| EFI_SUCCESS | 设备路径已被连接 |
+| EFI_NOT_FOUND | 未找到设备路径 |
+| EFI_NOT_FOUND | 没有驱动程序被连接到 DevicePath |
+| EFI_SECURITY_VIOLATION | 用户没有权限启动 UEFI 设备驱动程序设备路径 |
+| EFI_UNSUPPORTED | 当前的 TPL 不是 TPL_APPLICATION |
+
+### EFI_BOOT_MANAGER_POLICY_PROTOCOL.ConnectDeviceClass()
+
+
+#### 摘要
+使用平台启动管理器策略连接一类设备。
+
+
+#### 原型
+```C
+typedef EFI_STATUS(EFIAPI *EFI_BOOT_MANAGER_POLICY_CONNECT_DEVICE_CLASS)( 
+    IN EFI_BOOT_MANAGER_POLICY_PROTOCOL  *This, 
+    IN EFI_GUID                          *Class
+ );
+```
+
+#### 参数
+
+- This：指向EFI_BOOT_MANAGER_POLICY_PROTOCOL实例的一个指针。上面定义了EFI_BOOT_MANAGER_POLICY_PROTOCOL类型
+- Class：一个指向EFI_GUID的指针，代表将使用Boot Manager的平台策略连接的设备类别
+
+#### 描述
+
+ConnectDeviceClass()函数允许调用者请求引导管理器连接一个设备类别。
+
+如果Class是EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID，那么Boot Manager将使用平台策略来
+连接控制台。一些平台在尝试快速启动时可能会限制连接的控制台数量， 调用Class值为
+EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID的ConnectDeviceClass()必须连接遵循引导管理器
+平台策略的控制台集合。并且EFI_SIMPLE_TEXT_INPUT_PROTOCOL、
+EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL和EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL为
+在连接的手柄上产生。开机管理器可以根据平台策略限制哪些控制台可以被连接，例如，安全策略
+可能要求不连接某个特定的控制台。
+如果Class是EFI_BOOT_MANAGER_POLICY_NETWORK_GUID，那么启动管理器将在一个或多个手
+柄上连接平台支持的UEFI通用网络应用的协议。与UEFI通用网络应用相关的协议在第2.6.2节中定
+义，列表中的第7项。如果有一个以上的网络控制器，平台将根据平台策略连接一个、多个或所
+有的网络。 连接UEFI网络协议，如EFI_DHCP4_PROTOCOL，并不在网络上建立连接。 调用
+ConnectDeviceClass()的UEFI通用网络应用程序可能需要使用发布的协议来建立网络连接。启
+动管理器可以选择有一个策略来建立网络连接。
+如果Class是EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID，那么Boot Manager将使用UEFI
+Boot Service EFI_BOOT_SERVICES.ConnectController()连接所有UEFI驱动程序。如果Boot
+Manager有与连接所有UEFI驱动相关的策略，将使用这个策略
+
+一个平台也可以定义平台特定的Class值，因为正确生成的EFI_GUID绝不会与本规范冲突。
+
+
+
+#### 相关定义
+
+```C
+#define EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID \
+ { 0xCAB0E94C, 0xE15F, 0x11E3,\
+ { 0x91, 0x8D, 0xB8, 0xE8, 0x56, 0x2C, 0xBA, 0xFA } }
+#define EFI_BOOT_MANAGER_POLICY_NETWORK_GUID \
+ { 0xD04159DC, 0xE15F, 0x11E3,\
+ { 0xB2, 0x61, 0xB8, 0xE8, 0x56, 0x2C, 0xBA, 0xFA } }
+#define EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID \
+ { 0x113B2126, 0xFC8A, 0x11E3,\  
+ { 0xBD, 0x6C, 0xB8, 0xE8, 0x56, 0x2C, 0xBA, 0xFA } }
+```
+
+#### 返回的状态代码
+
+| 状态码 | 描述 |
+| :----: | :----: |
+| EFI_SUCCESS | 该类至少有一个设备被连接 |
+| EFI_DEVICE_ERROR | 由于一个错误， 设备没有被连接 |
+| EFI_NOT_FOUND | 该类平台不支持 |
+| EFI_UNSUPPORTED | 当前的 TPL 不是 TPL_APPLICATION |
+
+## 全局定义的变量
+
+本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为NV的变量是非易失性的。 这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有BS属性的变量仅在EFI_BOOT_SERVICES.ExitBootServices()被调用之前可用。 这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为RT的环境变量在ExitBootServices()被调用之前和之后都可用。 这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为AT的变量是具有第8.2.1节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用EFI_GLOBAL_VARIABLEVendorGuid
