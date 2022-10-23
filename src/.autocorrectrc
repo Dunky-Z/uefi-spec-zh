@@ -16,6 +16,10 @@ rules:
 spellcheck:
   mode: 1
   words:
+    - 映像 = 镜像
+    - 名称空间 = 命名空间
+    - 地图 = 映射
+    - 易失 = volatile
     - 引导 = 启动
     - 列举 = 枚举
     - 媒体 = 媒介

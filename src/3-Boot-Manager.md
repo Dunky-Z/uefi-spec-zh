@@ -286,12 +286,12 @@ ConnectDevicePath() 函数允许调用者使用与 EFI Boot Manager 相同的策
 
 ### EFI_BOOT_MANAGER_POLICY_PROTOCOL.ConnectDeviceClass()
 
-
 #### 摘要
+
 使用平台启动管理器策略连接一类设备。
 
-
 #### 原型
+
 ```C
 typedef EFI_STATUS(EFIAPI *EFI_BOOT_MANAGER_POLICY_CONNECT_DEVICE_CLASS)( 
     IN EFI_BOOT_MANAGER_POLICY_PROTOCOL  *This, 
@@ -301,33 +301,31 @@ typedef EFI_STATUS(EFIAPI *EFI_BOOT_MANAGER_POLICY_CONNECT_DEVICE_CLASS)(
 
 #### 参数
 
-- This：指向EFI_BOOT_MANAGER_POLICY_PROTOCOL实例的一个指针。上面定义了EFI_BOOT_MANAGER_POLICY_PROTOCOL类型
-- Class：一个指向EFI_GUID的指针，代表将使用Boot Manager的平台策略连接的设备类别
+- This：指向 EFI_BOOT_MANAGER_POLICY_PROTOCOL 实例的一个指针。上面定义了 EFI_BOOT_MANAGER_POLICY_PROTOCOL 类型
+- Class：一个指向 EFI_GUID 的指针，代表将使用 Boot Manager 的平台策略连接的设备类别
 
 #### 描述
 
-ConnectDeviceClass()函数允许调用者请求引导管理器连接一个设备类别。
+ConnectDeviceClass() 函数允许调用者请求引导管理器连接一个设备类别。
 
-如果Class是EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID，那么Boot Manager将使用平台策略来
-连接控制台。一些平台在尝试快速启动时可能会限制连接的控制台数量， 调用Class值为
-EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID的ConnectDeviceClass()必须连接遵循引导管理器
-平台策略的控制台集合。并且EFI_SIMPLE_TEXT_INPUT_PROTOCOL、
-EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL和EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL为
+如果 Class 是 EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID，那么 Boot Manager 将使用平台策略来
+连接控制台。一些平台在尝试快速启动时可能会限制连接的控制台数量，调用 Class 值为
+EFI_BOOT_MANAGER_POLICY_CONSOLE_GUID 的 ConnectDeviceClass() 必须连接遵循引导管理器
+平台策略的控制台集合。并且 EFI_SIMPLE_TEXT_INPUT_PROTOCOL、
+EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL 和 EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL 为
 在连接的手柄上产生。开机管理器可以根据平台策略限制哪些控制台可以被连接，例如，安全策略
 可能要求不连接某个特定的控制台。
-如果Class是EFI_BOOT_MANAGER_POLICY_NETWORK_GUID，那么启动管理器将在一个或多个手
-柄上连接平台支持的UEFI通用网络应用的协议。与UEFI通用网络应用相关的协议在第2.6.2节中定
-义，列表中的第7项。如果有一个以上的网络控制器，平台将根据平台策略连接一个、多个或所
-有的网络。 连接UEFI网络协议，如EFI_DHCP4_PROTOCOL，并不在网络上建立连接。 调用
-ConnectDeviceClass()的UEFI通用网络应用程序可能需要使用发布的协议来建立网络连接。启
+如果 Class 是 EFI_BOOT_MANAGER_POLICY_NETWORK_GUID，那么启动管理器将在一个或多个手
+柄上连接平台支持的 UEFI 通用网络应用的协议。与 UEFI 通用网络应用相关的协议在第 2.6.2 节中定
+义，列表中的第 7 项。如果有一个以上的网络控制器，平台将根据平台策略连接一个、多个或所
+有的网络。连接 UEFI 网络协议，如 EFI_DHCP4_PROTOCOL，并不在网络上建立连接。调用
+ConnectDeviceClass() 的 UEFI 通用网络应用程序可能需要使用发布的协议来建立网络连接。启
 动管理器可以选择有一个策略来建立网络连接。
-如果Class是EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID，那么Boot Manager将使用UEFI
-Boot Service EFI_BOOT_SERVICES.ConnectController()连接所有UEFI驱动程序。如果Boot
-Manager有与连接所有UEFI驱动相关的策略，将使用这个策略
+如果 Class 是 EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID，那么 Boot Manager 将使用 UEFI
+Boot Service EFI_BOOT_SERVICES.ConnectController() 连接所有 UEFI 驱动程序。如果 Boot
+Manager 有与连接所有 UEFI 驱动相关的策略，将使用这个策略
 
-一个平台也可以定义平台特定的Class值，因为正确生成的EFI_GUID绝不会与本规范冲突。
-
-
+一个平台也可以定义平台特定的 Class 值，因为正确生成的 EFI_GUID 绝不会与本规范冲突。
 
 #### 相关定义
 
@@ -348,10 +346,10 @@ Manager有与连接所有UEFI驱动相关的策略，将使用这个策略
 | 状态码 | 描述 |
 | :----: | :----: |
 | EFI_SUCCESS | 该类至少有一个设备被连接 |
-| EFI_DEVICE_ERROR | 由于一个错误， 设备没有被连接 |
+| EFI_DEVICE_ERROR | 由于一个错误，设备没有被连接 |
 | EFI_NOT_FOUND | 该类平台不支持 |
 | EFI_UNSUPPORTED | 当前的 TPL 不是 TPL_APPLICATION |
 
 ## 全局定义的变量
 
-本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为NV的变量是非易失性的。 这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有BS属性的变量仅在EFI_BOOT_SERVICES.ExitBootServices()被调用之前可用。 这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为RT的环境变量在ExitBootServices()被调用之前和之后都可用。 这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为AT的变量是具有第8.2.1节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用EFI_GLOBAL_VARIABLEVendorGuid
+本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为 NV 的变量是非易失性的。这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有 BS 属性的变量仅在 EFI_BOOT_SERVICES.ExitBootServices() 被调用之前可用。这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为 RT 的环境变量在 ExitBootServices() 被调用之前和之后都可用。这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为 AT 的变量是具有第 8.2.1 节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用 EFI_GLOBAL_VARIABLEVendorGuid

@@ -25,14 +25,18 @@ markdownlint -c ../.markdownlint.json -f ./*.md
 
 ```bash
 cd src
-autocorrect.exe --fix 1-Introduction.md 2-Overview.md 
+autocorrect.exe --fix 1-Introduction.md 2-Overview.md 3-Boot-Manager.md
 
-markdownlint -c ../.markdownlint.json -f 1-Introduction.md 2-Overview.md 
+markdownlint -c ../.markdownlint.json -f 1-Introduction.md 2-Overview.md 3-Boot-Manager.md
 ```
 
-## 获取PDF
+### 翻译约定
 
-该项目已配置GitHub Action，可以在Action中下载Artifacts。具体路径如下：
+- 规范中拿不准的术语翻译请添加（TODO）标识，以便后续完善；
+
+## 获取 PDF
+
+该项目已配置 GitHub Action，可以在 Action 中下载 Artifacts。具体路径如下：
 
 ![](./pic/get-pdf.jpg)
 
@@ -40,7 +44,7 @@ markdownlint -c ../.markdownlint.json -f 1-Introduction.md 2-Overview.md
 
 ## 手动构建 PDF
 
-> 因为PDF不方便版本管理，所以未将其添加，需要安装[pandoc](https://github.com/jgm/pandoc)并手动构建。
+> 因为 PDF 不方便版本管理，所以未将其添加，需要安装[pandoc](https://github.com/jgm/pandoc)并手动构建。
 
 ### Linux
 
@@ -55,5 +59,5 @@ pandoc -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templa
 ```bash
 md build
 cd src
-pandoc.exe -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templates/mppl.tex -s --listings 0-Preface.md 1-Introduction.md 2-Overview.md  -o ../build/UEFI规范-中文.pdf
+pandoc.exe -f  markdown-auto_identifiers --pdf-engine=xelatex   --template=../templates/mppl.tex -s --listings 0-Preface.md 1-Introduction.md 2-Overview.md 3-Boot-Manager.md -o ../build/UEFI规范-中文.pdf
 ```
