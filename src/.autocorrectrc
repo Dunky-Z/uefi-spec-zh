@@ -16,6 +16,7 @@ rules:
 spellcheck:
   mode: 1
   words:
+    - 哈特 = HART
     - 呼叫者 = 调用者
     - 实施 = 实现
     - 映像 = 镜像
