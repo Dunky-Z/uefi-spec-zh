@@ -16,6 +16,9 @@ rules:
 spellcheck:
   mode: 1
   words:
+    - 遗留 = 传统
+    - 选项 ROM = Option ROM
+    - 手柄 = 句柄
     - 哈特 = HART
     - 呼叫者 = 调用者
     - 实施 = 实现
