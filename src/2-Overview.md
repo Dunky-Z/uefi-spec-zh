@@ -465,6 +465,7 @@ Rdx – EFI_SYSTEM_TABLE
 根据本规范编写的应用程序可以改变处理器的执行模式，但调用的操作系统必须确保固件启动服务和运行时服务是在规定的执行环境下执行。
 
 如果支持 ACPI：
+
 - 在启动时加载的 ACPI 表可以包含在 `EfiACPIReclaimMemory`（推荐）或 `EfiACPIMemoryNVS` 类型的内存中。ACPI FACS 必须包含在 `EfiACPIMemoryNVS` 类型的内存中；
 - 系统固件不得为任何 `EfiACPIReclaimMemory` 或 `EfiACPIMemoryNVS` 类型的内存描述符请求虚拟映射；
 - `EfiACPIReclaimMemory` 和 `EfiACPIMemoryNVS` 类型的 EFI 内存描述符必须在 4KiB 边界上对齐，并且大小必须是 4KiB 的倍数；
