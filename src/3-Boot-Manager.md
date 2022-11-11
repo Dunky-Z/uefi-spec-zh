@@ -352,4 +352,54 @@ Manager 有与连接所有 UEFI 驱动相关的策略，将使用这个策略
 
 ## 全局定义的变量
 
-本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为 NV 的变量是非易失性的。这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有 BS 属性的变量仅在 EFI_BOOT_SERVICES.ExitBootServices() 被调用之前可用。这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为 RT 的环境变量在 ExitBootServices() 被调用之前和之后都可用。这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为 AT 的变量是具有第 8.2.1 节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用 EFI_GLOBAL_VARIABLEVendorGuid
+本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为 NV 的变量是非易失性的。这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有 BS 属性的变量仅在 EFI_BOOT_SERVICES.ExitBootServices() 被调用之前可用。这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为 RT 的环境变量在 ExitBootServices() 被调用之前和之后都可用。这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为 AT 的变量是具有第 8.2.1 节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用 EFI_GLOBAL_VARIABLE
+
+```c
+VendorGuid:
+# define EFI_GLOBAL_VARIABLE \{0x8BE4DF61,0x93CA,0x11d2,\ {0xAA,0x0D,0x00,0xE0,0x98,0x03,0x2B,0x8C}}
+```
+
+为了防止与未来可能的全局定义的变量发生名称冲突，这里没有定义的其他内部固件数据变量必须用一个唯一的 VendorGuid 来保存，而不是 EFI_GLOBAL_VARIABLE 或 UEFI 规范定义的任何其他 GUID。只有当 UEFI 规范中记录了这些变量时，实施才必须允许用 UEFI 规范定义的 VendorGuid 创建这些变量。
+
+| 变量名 | 属性 | 描述 |
+| :----: | :----: | :----: |
+| AuditMode | BS, RT | bbbbbb |
+| Boot#### | bbbbbb | bbbbbb |
+| BootCurrent | bbbbbb | bbbbbb |
+| BootNext | bbbbbb | bbbbbb |
+| BootOrder | bbbbbb | bbbbbb |
+| BootOptionSupport | bbbbbb | bbbbbb |
+| ConIn | bbbbbb | bbbbbb |
+| ConInDev | bbbbbb | bbbbbb |
+| ConOut | bbbbbb | bbbbbb |
+| ConOutDev | bbbbbb | bbbbbb |
+| dbDefault | bbbbbb | bbbbbb |
+| dbrDefault | bbbbbb | bbbbbb |
+| dbtDefault | bbbbbb | bbbbbb |
+| dbxDefault | bbbbbb | bbbbbb |
+| DeployedMode | bbbbbb | bbbbbb |
+| Driver#### | bbbbbb | bbbbbb |
+| DriverOrder | bbbbbb | bbbbbb |
+| ErrOut | bbbbbb | bbbbbb |
+| ErrOutDev | bbbbbb | bbbbbb |
+| HwErrRecSupport | bbbbbb | bbbbbb |
+| KEK | bbbbbb | bbbbbb |
+| KEKDefault | bbbbbb | bbbbbb |
+| Key#### | bbbbbb | bbbbbb |
+| Lang | bbbbbb | bbbbbb |
+| LangCodes | bbbbbb | bbbbbb |
+| OsIndications | bbbbbb | bbbbbb |
+| OsIndicationsSupported | bbbbbb | bbbbbb |
+| OsRecoveryOrder | bbbbbb | bbbbbb |
+| PK | bbbbbb | bbbbbb |
+| PKDefault | bbbbbb | bbbbbb |
+| PlatformLangCodes | bbbbbb | bbbbbb |
+| PlatformLang | bbbbbb | bbbbbb |
+| PlatformRecovery#### | bbbbbb | bbbbbb |
+| SignatureSupport | bbbbbb | bbbbbb |
+| SecureBoot | bbbbbb | bbbbbb |
+| SetupMode | bbbbbb | bbbbbb |
+| SysPrep#### | bbbbbb | bbbbbb |
+| SysPrepOrder | bbbbbb | bbbbbb |
+| Timeout | bbbbbb | bbbbbb |
+| VendorKeys | bbbbbb | bbbbbb |
