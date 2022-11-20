@@ -352,54 +352,118 @@ Manager 有与连接所有 UEFI 驱动相关的策略，将使用这个策略
 
 ## 全局定义的变量
 
-本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为 NV 的变量是非易失性的。这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有 BS 属性的变量仅在 EFI_BOOT_SERVICES.ExitBootServices() 被调用之前可用。这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为 RT 的环境变量在 ExitBootServices() 被调用之前和之后都可用。这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为 AT 的变量是具有第 8.2.1 节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用 EFI_GLOBAL_VARIABLE
+本节定义了一组具有架构定义含义的变量。除了定义的数据内容外，每个这样的变量都有一个架构上定义的属性，表明当数据变量可以被访问。属性为 NV 的变量是非易失性的。这意味着它们的值在复位和电源循环中是持久的。任何没有这个属性的环境变量的值都会在系统断电后丢失，而且固件保留内存的状态也不会被保留下来。具有 BS 属性的变量仅在 `EFI_BOOT_SERVICES.ExitBootServices()` 被调用之前可用。这意味着这些环境变量只能在预启动环境中被检索或修改。它们对操作系统是不可见的。属性为 RT 的环境变量在 `ExitBootServices()` 被调用之前和之后都可用。这种类型的环境变量可以在预启动环境和操作系统中被检索和修改。属性为 AT 的变量是具有第 8.2.1 节中定义的基于时间的验证写入权限的变量。所有架构定义的变量都使用 `EFI_GLOBAL_VARIABLE`。
 
 ```c
-VendorGuid:
+EFI_GLOBAL_VARIABLE VendorGuid:
 # define EFI_GLOBAL_VARIABLE \{0x8BE4DF61,0x93CA,0x11d2,\ {0xAA,0x0D,0x00,0xE0,0x98,0x03,0x2B,0x8C}}
 ```
 
-为了防止与未来可能的全局定义的变量发生名称冲突，这里没有定义的其他内部固件数据变量必须用一个唯一的 VendorGuid 来保存，而不是 EFI_GLOBAL_VARIABLE 或 UEFI 规范定义的任何其他 GUID。只有当 UEFI 规范中记录了这些变量时，实施才必须允许用 UEFI 规范定义的 VendorGuid 创建这些变量。
+为了防止与未来可能的全局定义的变量发生名称冲突，这里没有定义的其他内部固件数据变量必须用一个唯一的 VendorGuid 来保存，而不是 `EFI_GLOBAL_VARIABLE` 或 UEFI 规范定义的任何其他 GUID。只有当 UEFI 规范中记录了这些变量时，实施才必须允许用 UEFI 规范定义的 `VendorGuid` 创建这些变量。
 
 | 变量名 | 属性 | 描述 |
 | :----: | :----: | :----: |
-| AuditMode | BS, RT | bbbbbb |
-| Boot#### | bbbbbb | bbbbbb |
-| BootCurrent | bbbbbb | bbbbbb |
-| BootNext | bbbbbb | bbbbbb |
-| BootOrder | bbbbbb | bbbbbb |
-| BootOptionSupport | bbbbbb | bbbbbb |
-| ConIn | bbbbbb | bbbbbb |
-| ConInDev | bbbbbb | bbbbbb |
-| ConOut | bbbbbb | bbbbbb |
-| ConOutDev | bbbbbb | bbbbbb |
-| dbDefault | bbbbbb | bbbbbb |
-| dbrDefault | bbbbbb | bbbbbb |
-| dbtDefault | bbbbbb | bbbbbb |
-| dbxDefault | bbbbbb | bbbbbb |
-| DeployedMode | bbbbbb | bbbbbb |
-| Driver#### | bbbbbb | bbbbbb |
-| DriverOrder | bbbbbb | bbbbbb |
-| ErrOut | bbbbbb | bbbbbb |
-| ErrOutDev | bbbbbb | bbbbbb |
-| HwErrRecSupport | bbbbbb | bbbbbb |
-| KEK | bbbbbb | bbbbbb |
-| KEKDefault | bbbbbb | bbbbbb |
-| Key#### | bbbbbb | bbbbbb |
-| Lang | bbbbbb | bbbbbb |
-| LangCodes | bbbbbb | bbbbbb |
-| OsIndications | bbbbbb | bbbbbb |
-| OsIndicationsSupported | bbbbbb | bbbbbb |
-| OsRecoveryOrder | bbbbbb | bbbbbb |
-| PK | bbbbbb | bbbbbb |
-| PKDefault | bbbbbb | bbbbbb |
-| PlatformLangCodes | bbbbbb | bbbbbb |
-| PlatformLang | bbbbbb | bbbbbb |
-| PlatformRecovery#### | bbbbbb | bbbbbb |
-| SignatureSupport | bbbbbb | bbbbbb |
-| SecureBoot | bbbbbb | bbbbbb |
-| SetupMode | bbbbbb | bbbbbb |
-| SysPrep#### | bbbbbb | bbbbbb |
-| SysPrepOrder | bbbbbb | bbbbbb |
-| Timeout | bbbbbb | bbbbbb |
-| VendorKeys | bbbbbb | bbbbbb |
+| AuditMode | BS, RT | 系统是否在审核模式下运行 (1) 或 (0)。所有其他值均保留。应被视为只读，除非 DeployedMode 为 0。调用 ExitBootServices() 后始终变为只读。 |
+| Boot#### | NV, BS, RT | 引导加载选项。 #### 是打印的十六进制值。十六进制值中不包含 0x 或 h |
+| BootCurrent | BS, RT  | 引导加载选项。 #### 是打印的十六进制值。十六进制值中不包含 0x 或 h |
+| BootNext | NV, BS, RT | 仅用于下次启动的启动选项。 |
+| BootOrder | NV, BS, RT  | 有序引导选项加载列表。 |
+| BootOptionSupport | BS,RT | 引导管理器支持的引导选项类型。应视为只读。 |
+| ConIn | NV, BS, RT | 默认输入控制台的设备路径。 |
+| ConInDev | BS, RT  | 所有可能的控制台输入设备的设备路径。 |
+| ConOut | NV, BS, RT | 默认输出控制台的设备路径。 |
+| ConOutDev | BS, RT  | 所有可能的控制台输出设备的设备路径。 |
+| dbDefault | BS, RT | OEM 的默认安全启动签名存储。应被视为只读。 |
+| dbrDefault | BS, RT  | OEM 的默认操作系统恢复签名存储。应视为只读。 |
+| dbtDefault | BS, RT  | OEM 的默认安全启动时间戳签名存储。应被视为只读 |
+| dbxDefault | BS, RT | OEM 的默认安全启动黑名单签名存储。应视为只读。 |
+| DeployedMode | BS, RT | 系统是否在部署模式下运行 (1) 或 (0)。所有其他值均保留。当其值为 1 时应被视为只读。在调用 ExitBootServices() 后始终变为只读。 |
+| Driver#### | NV, BS, RT | 驱动程序加载选项。 #### 是打印的十六进制值。 |
+| DriverOrder | NV, BS, RT | bbbbbb |有序的驱动程序加载选项列表。
+| ErrOut | NV, BS, RT | 默认错误输出设备的设备路径。 |
+| ErrOutDev | BS, RT | 所有可能的错误输出设备的设备路径。 |
+| HwErrRecSupport | NV, BS, RT | 标识平台实现的硬件错误记录持久性支持级别。此变量仅由固件修改并且对操作系统是只读的。 |
+| KEK | NV, BS, RT,AT | 密钥交换密钥签名数据库。 |
+| KEKDefault | BS, RT | OEM 的默认密钥交换密钥签名数据库。应被视为只读。 |
+| Key#### | NV, BS, RT | 描述热键与 Boot#### 加载选项的关系。 |
+| Lang | NV, BS, RT | 系统配置的语言代码。此值已弃用。 |
+| LangCodes | BS, RT | 固件所支持的语言代码。此值已被废弃。 |
+| OsIndications | NV, BS, RT  | 允许操作系统请求固件启用某些功能并执行某些操作。 |
+| OsIndicationsSupported | BS, RT  | 允许固件向操作系统指示支持的功能和操作 |
+| OsRecoveryOrder | BS,RT,NV,AT | 操作系统指定的恢复选项 |
+| PK | NV, BS, RT,AT | 公共平台密钥。 |
+| PKDefault | BS, RT | OEM 的默认公共平台密钥。应被视为只读 |
+| PlatformLangCodes | BS, RT | 固件支持的语言代码。 |
+| PlatformLang | NV, BS, RT | 系统配置的语言代码。 |
+| PlatformRecovery#### | BS, RT | 平台指定的恢复选项。这些变量仅由固件修改并且对操作系统是只读的。 |
+| SignatureSupport | BS, RT  | 表示平台固件支持的签名类型的 GUID 数组。应被视为只读 |
+| SecureBoot | BS, RT | 平台固件是否在安全启动模式下运行 (1) 或 (0)。所有其他值均保留。应被视为只读。 |
+| SetupMode | BS, RT | 系统是否应要求对安全启动策略变量的 SetVariable() 请求进行身份验证 (0) 或 (1)。应视为只读。当 SetupMode==1，AuditMode==0，DeployedMode==0 时，系统处于“设置模式” |
+| SysPrep#### | NV, BS, RT | 包含 EFI_LOAD_OPTION 描述符的 System Prep 应用程序加载选项。 #### 是打印的十六进制值。 |
+| SysPrepOrder | NV, BS, RT | 有序的系统准备应用程序加载选项列表。 |
+| Timeout | NV, BS, RT | 在启动默认引导选择之前，固件的引导管理器超时（以秒为单位） |
+| VendorKeys | BS, RT | 系统是否配置为仅使用供应商提供的密钥。应视为只读。 |
+
+`PlatformLangCodes` 变量包含一个以 null 结尾的 ASCII 字符串，表示固件可以支持的语言代码。在初始化时，固件会计算支持的语言并创建此数据变量。由于固件在每次初始化时都会创建此值，因此其内容不会存储在非易失性存储器中。该值被认为是只读的。`PlatformLangCodes` 以 Native RFC 4646 格式指定。请参阅附录 M。`LangCodes` 已弃用，可能会提供以实现向后兼容性。
+
+`PlatformLang` 变量包含机器已配置的以 n​​ull 结尾的 ASCII 字符串语言代码。该值可以更改为 `PlatformLangCodes` 支持的任何值。如果在预引导环境中进行此更改，则更改将立即生效。如果此更改是在操作系统运行时进行的，则更改要到下次启动时才会生效。如果语言代码设置为不受支持的值，固件将在初始化时选择受支持的默认值并将 `PlatformLang` 设置为受支持的值。`PlatformLang` 以 Native RFC 4646 数组格式指定。请参阅附录 M。`Lang` 已弃用，可能会提供以实现向后兼容性。
+
+`Lang` 已被弃用。如果平台支持这个变量，它必须以适当的形式将 `Lang` 变量中的任何更改映射到 `PlatformLang`。
+
+`Langcodes` 已被弃用。如果平台支持此变量，则它必须以适当的格式将 `Langcodes` 变量中的任何更改映射到 `PlatformLang`。
+
+`Timeout` 变量包含一个二进制 `UINT16`，它提供固件在启动原始默认引导选择之前将等待的秒数。值 0 表示默认引导选择将在引导时立即启动。如果该值不存在，或包含 `0xFFFF` 的值，则固件将在引导前等待用户输入。这意味着固件不会自动启动默认启动选择。
+
+`ConIn`、`ConOut` 和 `ErrOut` 变量分别包含一个 `EFI_DEVICE_PATH_PROTOCOL` 描述符，定义了启动时使用的默认设备。在预启动环境中对这些值的改变会立即生效。在操作系统运行时对这些值的改变要到下一次启动时才会生效。如果固件不能解决设备路径，允许它根据需要自动替换这些值，为系统提供一个控制台。如果设备路径以 USB 类设备路径开始（见表 10-25），那么任何符合设备路径的输入或输出设备都必须作为控制台使用，如果它被固件支持的话。
+
+`ConInDev`、`ConOutDev` 和 `ErrOutDev` 变量均包含一个 `EFI_DEVICE_PATH_PROTOCOL` 描述符，该描述符定义了所有可能在引导时使用的默认设备。这些变量是易变的，并且在每次启动时动态设置。`ConIn`、`ConOut` 和 `ErrOut` 始终是 `ConInDev`、`ConOutDev` 和 `ErrOutDev` 的真子集。
+
+每个 `Boot####` 变量都包含一个 `EFI_LOAD_OPTION`。每个 `Boot####` 变量都是名称“Boot”附加一个唯一的四位十六进制数字。例如，`Boot0001`、`Boot0002`、`Boot0A02` 等。
+
+`OsRecoveryOrder` 变量包含一个 `EFI_GUID` 结构的数组。每个 `EFI_GUID` 结构为包含操作系统定义的恢复条目的变量指定一个命名空间（见第 3.4.1 节）。对这个变量的写访问由安全密钥数据库 dbr 控制（见第 8.2.1 节）。
+
+`PlatformRecovery####` 变量与 `Boot####` 变量共享相同的结构。这些变量是在系统执行引导选项恢复时处理的。
+
+`BootOrder` 变量包含一个 UINT16 的数组，构成了 `Boot####` 选项的有序列表。数组中的第一个元素是第一个逻辑启动选项的值，第二个元素是第二个逻辑启动选项的值，等等。`BootOrder` 顺序列表被固件的引导管理器作为默认的引导顺序。
+
+`BootNext` 变量是单个 UINT16，它定义了 `Boot####` 选项，该选项将在下次启动时首先尝试。在尝试使用 `BootNext` 引导选项后，将使用正常的 `BootOrder` 列表。为防止循环，引导管理器在将控制转移到预选引导选项之前删除此变量。
+
+`BootCurrent` 变量是一个单一的 UINT16，它定义了当前启动时选择的 `Boot####` 选项。
+
+`BootOptionSupport` 变量是一个 UINT32，它定义了引导管理器支持的引导选项类型。
+
+每个 `Driver####` 变量都包含一个 `EFI_LOAD_OPTION`。每个加载选项变量都附加一个唯一的编号，例如 `Driver0001`、`Driver0002` 等。
+
+`DriverOrder` 变量包含一个 UINT16 的数组，构成了 `Driver####`变量的有序列表。数组中的第一个元素是第一个逻辑驱动加载选项的值，第二个元素是第二个逻辑驱动加载选项的值，等等。该 `DriverOrder` 列表被固件的启动管理器用作 UEFI 驱动程序的默认加载顺序，它应该明确地加载这些驱动程序。
+
+`Key####` 变量将按键与单个引导选项相关联。每个 `Key####` 变量都是名称“Key”附加一个唯一的四位十六进制数字。例如，`Key0001`、`Key0002`、`Key00A0` 等。
+
+`HwErrRecSupport` 变量包含一个二进制 UINT16，它提供对由平台实现的硬件错误记录持久性（请参阅第 8.2.4 节）的支持级别。如果该值不存在，则平台不实现对硬件错误记录持久性的支持。零值表示平台不支持硬件错误记录持久性。值为 1 表示平台实现了第 8.2.4 节中定义的硬件错误记录持久性。固件初始化这个变量。所有其他值保留供将来使用。
+
+`SetupMode` 变量是一个 8 位无符号整数，它定义系统是否应该在 `SetVariable()` 请求安全引导策略变量时要求身份验证 (0) 或不需要 (1)。安全启动策略变量包括：
+
+- 全局变量 `PK`、`KEK` 和 `OsRecoveryOrder`
+- 所有 VendorGuid 下名为 `OsRecovery####` 的所有变量
+- 具有 VendorGuid `EFI_IMAGE_SECURITY_DATABASE_GUID` 的所有变量。
+
+必须使用 `EFI_VARIABLE_AUTHENTICATION_2` 结构创建安全启动策略变量。
+
+`AuditMode` 变量是一个 8 位无符号整数，它定义系统当前是否在审计模式下运行。
+
+`DeployedMode` 变量是一个 8 位无符号整数，定义系统当前是否在部署模式下运行。
+
+`KEK` 变量包含当前密钥交换密钥数据库。
+
+`PK` 变量包含当前的平台密钥。
+
+`VendorKeys` 变量是一个 8 位无符号整数，用于定义安全引导策略变量是否已被平台供应商或供应商提供的密钥持有者以外的任何人修改。值为 0 表示平台供应商或供应商提供的密钥的持有者以外的其他人修改了安全启动策略变量，否则该值为 1。
+
+`KEKDefault` 变量（如果存在）包含平台定义的密钥交换密钥数据库。这在运行时不使用，但提供是为了允许操作系统恢复 OEM 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION` 或 `EFI_VARIABLE_AUTHENTICATION2` 结构。
+
+`PKDefault` 变量（如果存在）包含平台定义的平台密钥。这在运行时不使用，但提供是为了允许操作系统恢复 `OEM` 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION2` 结构。
+
+`dbDefault` 变量（如果存在）包含平台定义的安全启动签名数据库。这在运行时不使用，但提供是为了允许操作系统恢复 OEM 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION2` 结构。
+
+`dbrDefault` 变量（如果存在）包含平台定义的安全启动授权恢复签名数据库。这在运行时不使用，但提供是为了允许操作系统恢复 OEM 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION2` 结构。
+
+`dbtDefault` 变量（如果存在）包含平台定义的安全启动时间戳签名数据库。这在运行时不使用，但提供是为了允许操作系统恢复 OEM 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION2` 结构。
