@@ -467,3 +467,49 @@ EFI_GLOBAL_VARIABLE VendorGuid:
 `dbrDefault` 变量（如果存在）包含平台定义的安全启动授权恢复签名数据库。这在运行时不使用，但提供是为了允许操作系统恢复 OEM 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION2` 结构。
 
 `dbtDefault` 变量（如果存在）包含平台定义的安全启动时间戳签名数据库。这在运行时不使用，但提供是为了允许操作系统恢复 OEM 的默认密钥设置。此变量的内容不包括 `EFI_VARIABLE_AUTHENTICATION2` 结构。
+
+## 引导选项恢复
+
+引导选项恢复由两个独立的部分组成，操作系统定义的恢复和平台定义的恢复。操作系统定义的恢复是一种尝试，允许已安装的操作系统恢复任何需要的引导选项，或启动完整的操作系统恢复。平台定义的恢复包括平台在未找到操作系统时作为最后手段执行的任何补救措施，例如默认引导行为（请参阅第 3.4.3 节）。这可能包括保修服务重新配置或诊断选项等行为。
+
+如果必须执行启动选项恢复，启动管理器必须首先尝试操作系统定义的恢复，然后通过 `Boot####` 和 `BootOrder` 变量重新尝试正常启动，如果没有选项成功，最后尝试平台定义的恢复。
+
+### 操作系统定义的引导选项恢复
+
+如果在 `OsIndications` 中设置了 `EFI_OS_INDICATIONS_START_OS_RECOVERY` 位，或者如果 `BootOrder` 的处理没有成功，则平台必须处理操作系统定义的恢复选项。如果由于 `OsIndications` 而进入操作系统定义的恢复，则不应处理 `SysPrepOrder` 和 `SysPrep####` 变量。请注意，为了避免意图歧义，如果设置了 `EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY`，则在 `OsIndications` 中忽略此位。
+
+操作系统定义的恢复使用 `OsRecoveryOrder` 变量，以及使用供应商特定的 `VendorGuid` 值创建的变量和遵循模式 `OsRecovery####` 的名称。这些变量中的每一个都必须是具有 `EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS` 属性集的经过身份验证的变量。
+
+为了处理这些变量，引导管理器遍历 `OsRecoveryOrder` 变量中的 `EFI_GUID` 结构数组，并且每个指定的 `GUID` 都被视为与一系列变量名称相关联的 `VendorGuid`。对于每个 `GUID`，固件会尝试以十六进制排序顺序加载和执行每个具有该 `GUID` 和名称遵循模式 `OsRecovery####` 的变量。这些变量与 `Boot####` 变量具有相同的格式，并且启动管理器必须验证它尝试加载的每个变量都是使用与证书相关联的公钥创建的，该证书链接到授权恢复签名数据库 `dbr` 中列出的证书并且不在禁止的签名数据库中，或者由密钥交换密钥数据库 `KEK` 或当前平台密钥 `PK` 中的密钥创建。
+
+如果引导管理器在没有调用 `EFI_BOOT_SERVICES.ExitBootServices()` 或 `ResetSystem()` 的情况下完成 `OsRecovery####` 选项的处理，则它必须尝试第二次处理 `BootOrder`。如果在该过程中引导不成功，操作系统定义的恢复失败，引导管理器必须尝试基于平台的恢复。
+
+如果在处理 `OsRecovery####` 变量时，引导管理器遇到由于违反安全策略而无法加载或执行的条目，则它必须忽略该变量。
+
+### 平台定义的引导选项恢复
+
+如果在 `OsIndications` 中设置了 `EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY` 位，或者如果操作系统定义的恢复失败，则系统固件必须通过以与 `OsRecovery####` 相同的方式迭代其 `PlatformRecovery####`变量来开始特定于平台的恢复，但必须如果任何条目成功，则停止处理。如果由于 `OsIndications` 而输入特定于平台的恢复，则不应处理 `SysPrepOrder` 和 `SysPrep####` 变量。
+
+### 引导选项变量默认引导行为
+
+全局定义变量的默认状态是特定于固件供应商的。但是，在平台上不存在有效引导选项的例外情况下，引导选项需要标准默认行为。任何时候 `BootOrder` 变量不存在或仅指向不存在的引导选项，或者如果 `BootOrder` 中的条目都无法成功执行，则必须调用默认行为。
+
+如果系统固件支持启动选项恢复，如第 3.4 节所述，系统固件必须包含一个 `PlatformRecovery####` 变量，指定一个简短格式的文件路径媒体设备路径（请参阅第 3.1.2 节），其中包含可移动媒体的平台默认文件路径（见表 3-2）。为了最大程度地兼容本规范的先前版本，建议将此条目作为第一个此类变量，尽管它可能位于列表中的任何位置。
+
+预计此默认引导将加载操作系统或维护实用程序。如果这是操作系统设置程序，则它负责为后续引导设置必要的环境变量。平台固件还可以决定恢复或设置为一组已知的启动选项。
+
+## 引导机制
+
+EFI 可以使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 或 `EFI_LOAD_FILE_PROTOCOL` 从设备引导。支持 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 的设备必须实现该设备可引导的文件系统协议。如果设备不希望支持完整的文件系统，它可能会生成一个 `EFI_LOAD_FILE_PROTOCOL`，允许它直接实现图像。引导管理器将首先尝试使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 进行引导。如果失败，则将使用 `EFI_LOAD_FILE_PROTOCOL`。
+
+### 通过简单文件协议启动
+
+当通过 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 引导时，`FilePath` 将以指向实现 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 或 `EFI_BLOCK_IO_PROTOCOL` 的设备的设备路径开始。 `FilePath` 的下一部分可能指向文件名，包括包含可引导映像的子目录。如果文件名是空设备路径，则文件名必须根据下面定义的规则生成。
+
+如果 `FilePathList[0]` 设备不支持 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL`，但支持 `EFI_BLOCK_IO_PROTOCOL` 协议，则必须为 `FilePathList[0]` 调用 EFI 引导服务 `EFI_BOOT_SERVICES.ConnectController()`，`DriverImageHandle` 和 `RemainingDevicePath` 设置为 `NULL`，递归标志设置为 `TRUE`。然后固件将尝试从使用下面概述的算法生成的任何子句柄启动。
+
+指定文件系统的格式包含在第 13.3 节中。虽然固件必须生成一个理解 UEFI 文件系统的 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL`，但是任何文件系统都可以使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 接口进行抽象。
+
+#### 可移动媒体引导行为
+
+要在 `FilePath` 中不存在文件名时生成文件名，固件必须以 `\EFI\BOOT\BOOT{machine type short-name}.EFI` 形式附加默认文件名，其中 machine type short-name 定义 PE32+ 图像格式建筑学。每个文件只包含一种 UEFI 映像类型，系统可能支持从一种或多种映像类型启动。表 3-2 列出了 UEFI 图像类型。
