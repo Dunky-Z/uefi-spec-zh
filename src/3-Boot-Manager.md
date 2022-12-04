@@ -510,6 +510,24 @@ EFI 可以使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 或 `EFI_LOAD_FILE_PROTOCOL` 
 
 指定文件系统的格式包含在第 13.3 节中。虽然固件必须生成一个理解 UEFI 文件系统的 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL`，但是任何文件系统都可以使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 接口进行抽象。
 
-#### 可移动媒体引导行为
+#### 移动媒介引导行为
 
 要在 `FilePath` 中不存在文件名时生成文件名，固件必须以 `\EFI\BOOT\BOOT{machine type short-name}.EFI` 形式附加默认文件名，其中 machine type short-name 定义 PE32+ 图像格式建筑学。每个文件只包含一种 UEFI 映像类型，系统可能支持从一种或多种映像类型启动。表 3-2 列出了 UEFI 图像类型。
+
+![UEFI 镜像类型](../pic/table3-2.png "UEFI镜像类型")
+
+媒体可以通过简单地拥有一个 \EFI\BOOT\BOOT{machine type short-name}.EFI 文件来支持多种体系结构。
+
+### 通过加载文件协议启动
+
+当通过 `EFI_LOAD_FILE_PROTOCOL` 协议启动时，`FilePath` 是一个设备路径，指向“说出” `EFI_LOAD_FILE_PROTOCOL` 的设备。图像直接从支持 `EFI_LOAD_FILE_PROTOCOL` 的设备加载。`FilePath` 的其余部分将包含特定于设备的信息。固件将此特定于设备的数据传递给加载的图像，但不使用它来加载图像。如果 `FilePath` 的其余部分是空设备路径，则加载的映像有责任实施策略以找到正确的引导设备。
+
+`EFI_LOAD_FILE_PROTOCOL` 用于不直接支持文件系统的设备。网络设备通常以这种模式启动，在这种模式下图像无需文件系统即可实现。
+
+#### 网络引导
+
+网络引导由预引导执行环境 (Preboot eXecution Environment，PXE) BIOS 支持规范描述，该规范是 Wired for Management Baseline 规范的一部分。PXE 指定引导平台可用于与智能系统加载服务器交互的 UDP、DHCP 和 TFTP 网络协议。UEFI 定义了用于实现 PXE 的特殊接口。这些接口包含在 EFI_PXE_BASE_CODE_PROTOCOL 中（参见第 24.3 节）。
+
+#### 未来引导媒体
+
+由于 UEFI 定义了平台和操作系统及其加载程序之间的抽象，因此随着技术的发展，应该可以添加新类型的引导媒体。操作系统加载程序不一定要更改以支持新类型的引导。UEFI 平台服务的实现可能会发生变化，但接口将保持不变。操作系统将需要驱动程序来支持新型引导媒体，以便它可以从 UEFI 引导服务过渡到引导媒体的操作系统控制。
