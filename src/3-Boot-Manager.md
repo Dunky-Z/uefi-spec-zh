@@ -516,7 +516,7 @@ EFI 可以使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 或 `EFI_LOAD_FILE_PROTOCOL` 
 
 ![UEFI 镜像类型](../pic/table3-2.png "UEFI镜像类型")
 
-媒体可以通过简单地拥有一个 \EFI\BOOT\BOOT{machine type short-name}.EFI 文件来支持多种体系结构。
+媒体可以通过简单地拥有一个 `\EFI\BOOT\BOOT{machine type short-name}.EFI` 文件来支持多种体系结构。
 
 ### 通过加载文件协议启动
 
