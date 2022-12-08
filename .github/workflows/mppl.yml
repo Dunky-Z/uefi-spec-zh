@@ -1,7 +1,9 @@
 name: MPPL
 
-on: push
-
+on:
+  push:
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   convert_via_pandoc:
     runs-on: ubuntu-latest
@@ -34,8 +36,23 @@ jobs:
       - name: build pdf
         run: |
           cd src
-          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../MPPL/templates/mppl.tex  --output=../output/UEFI规范-中文.pdf *.md
-      - uses: actions/upload-artifact@master
+          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../MPPL/templates/mppl.tex  --output=../output/UEFI-Spec-ZH.pdf *.md
+      # - uses: actions/upload-artifact@master
+      #   with:
+      #     name: UEFI 规范 - 中文
+      #     path: output/UEFI规范-中文.pdf
+      # - name: echo
+      #   run: |
+      #     pwd
+      #     ls -a
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        # if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: output
-          path: output
+          tag_name: v0.1
+          # name: Release v0.1
+          body: TODO New Release.
+          draft: false
+          prerelease: false
+          files: |
+            output/UEFI-Spec-ZH.pdf

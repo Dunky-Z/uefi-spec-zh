@@ -387,4 +387,3 @@ typedef struct{
 
 - VendorGuid 唯一标识系统配置表的 128 位 GUID 值。
 - VendorTable 指向与 `VendorGuid` 关联的表的指针。用于存储表的内存类型以及该指针在运行时是物理地址还是虚拟地址（当调用 `SetVirtualAddressMap()` 时，表中报告的特定地址是否得到修复）由 `VendorGuid` 确定。除非另有说明，否则表缓冲区的内存类型由第 2 章调用约定部分中规定的指南定义。定义 VendorTable 的规范有责任指定额外的内存类型要求（如果有）以及是否转换表中报告的地址。任何所需的地址转换都是发布相应配置表的驱动程序的责任。指向与 VendorGuid 关联的表的指针。这个指针在运行时是物理地址还是虚拟地址由 `VendorGuid` 决定。与给定 `VendorTable` 指针关联的 `VendorGuid` 定义在调用 `SetVirtualAddressMap()` 时表中报告的特定地址是否得到修复。定义 `VendorTable` 的规范有责任指定是否转换表中报告的地址。
-
