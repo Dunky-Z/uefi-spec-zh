@@ -34,14 +34,6 @@ markdownlint -c ../.markdownlint.json -f 1-Introduction.md 2-Overview.md 3-Boot-
 
 - 规范中拿不准的术语翻译请添加（TODO）标识，以便后续完善；
 
-## 获取 PDF
-
-该项目已配置 GitHub Action，可以在 Action 中下载 Artifacts。具体路径如下：
-
-![](./pic/get-pdf.jpg)
-
-打开页面底端找到`Artifacts-output`。下载`output`解压即可。
-
 ## 手动构建 PDF
 
 > 因为 PDF 不方便版本管理，所以未将其添加，需要安装[pandoc](https://github.com/jgm/pandoc)并手动构建。
