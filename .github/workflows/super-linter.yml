@@ -27,3 +27,11 @@ jobs:
           VALIDATE_MARKDOWN: true
           DEFAULT_BRANCH: "main"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Codespell with annotations
+        uses: codespell-project/actions-codespell@v1.0
+        with:
+          check_filenames: true
+          check_hidden: true
+          skip: ./.git,./.github/workflows/*,./.gitignore,./.codespellignore
+          ignore_words_file: ./.codespellignore
+          only_warn: 1
