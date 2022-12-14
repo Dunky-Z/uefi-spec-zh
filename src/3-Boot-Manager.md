@@ -140,7 +140,7 @@ UINT32                              Attributes; UINT16                          
 
 引导管理器可以为应用程序支持一个单独的 `Boot####` 加载选项类别。启动管理器通过在 `BootOptionSupport` 全局变量中设置 `EFI_BOOT_OPTION_SUPPORT_APP` 来表明它支持这个单独的类别。
 
-当一个应用程序的 `Boot####` 选项被添加到 `BootOrder` 中时，安装者应该清除 `LOAD_OPTION_ACTIVE`，这样引导管理器就不会试图自动 "引导 "这个应用程序。如果启动管理器指出它支持一个单独的应用程序类别，如上所述，安装者应该设置 `LOAD_OPTION_CATEGORY_APP`。如果不是，它应该设置 `LOAD_OPTION_CATEGORY_BOOT`。
+当一个应用程序的 `Boot####` 选项被添加到 `BootOrder` 中时，安装者应该清除 `LOAD_OPTION_ACTIVE`，这样引导管理器就不会试图自动 "启动 "这个应用程序。如果启动管理器指出它支持一个单独的应用程序类别，如上所述，安装者应该设置 `LOAD_OPTION_CATEGORY_APP`。如果不是，它应该设置 `LOAD_OPTION_CATEGORY_BOOT`。
 
 ### 使用热键启动 Boot#### 加载选项
 
