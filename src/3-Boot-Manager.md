@@ -528,6 +528,6 @@ EFI 可以使用 `EFI_SIMPLE_FILE_SYSTEM_PROTOCOL` 或 `EFI_LOAD_FILE_PROTOCOL` 
 
 网络引导由预引导执行环境 (Preboot eXecution Environment，PXE) BIOS 支持规范描述，该规范是 Wired for Management Baseline 规范的一部分。PXE 指定引导平台可用于与智能系统加载服务器交互的 UDP、DHCP 和 TFTP 网络协议。UEFI 定义了用于实现 PXE 的特殊接口。这些接口包含在 EFI_PXE_BASE_CODE_PROTOCOL 中（参见第 24.3 节）。
 
-#### 未来引导媒体
+#### 未来引导媒介
 
 由于 UEFI 定义了平台和操作系统及其加载程序之间的抽象，因此随着技术的发展，应该可以添加新类型的引导媒体。操作系统加载程序不一定要更改以支持新类型的引导。UEFI 平台服务的实现可能会发生变化，但接口将保持不变。操作系统将需要驱动程序来支持新型引导媒体，以便它可以从 UEFI 引导服务过渡到引导媒体的操作系统控制。

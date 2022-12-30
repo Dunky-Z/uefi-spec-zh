@@ -1,4 +1,4 @@
-# UEFI 规范 - 中文![](https://geps.dev/progress/44)
+# UEFI 规范 - 中文![](https://geps.dev/progress/100)
 
 ## 简介
 

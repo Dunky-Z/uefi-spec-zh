@@ -9,10 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: create file list
-        id: files_list
-        run: |
-          mkdir output  # create output dir
       - name: Git Sumbodule Update
         run: |
           git submodule update --init --remote --recursive
@@ -36,7 +32,7 @@ jobs:
       - name: build pdf
         run: |
           cd src
-          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../MPPL/templates/mppl.tex  --output=../output/UEFI-Spec-ZH.pdf *.md
+          pandoc -f  markdown-auto_identifiers  --listings --pdf-engine=xelatex --template=../MPPL/templates/mppl.tex  --output=UEFI-Spec-ZH.pdf 0-Preface.md 1-Introduction.md 2-Overview.md 3-Boot-Manager.md 4-EFI-System-Table.md 5-GUID-Partition-Table-Disk-Layout.md 6-Block-Translation-Table-Layout.md 7-Services-Boot-Services.md 8-Services-Runtime-Services.md
       # - uses: actions/upload-artifact@master
       #   with:
       #     name: UEFI 规范 - 中文
@@ -51,8 +47,8 @@ jobs:
         with:
           tag_name: v0.1
           # name: Release v0.1
-          body: TODO New Release.
+          body: UEFI 手册第 1-8 章初稿
           draft: false
           prerelease: false
           files: |
-            output/UEFI-Spec-ZH.pdf
+            src/UEFI-Spec-ZH.pdf

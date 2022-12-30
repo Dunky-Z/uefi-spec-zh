@@ -282,6 +282,3 @@ typedef struct {
 } EFI_PARTITION_ENTRY;
 #pragma pack()
 ```
-
-| 助记符 | 字节偏移 | 字节长度 |  描述  |
-| :----: | :------: | :------: | :----: |
